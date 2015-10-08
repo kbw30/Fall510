@@ -1,0 +1,83 @@
+---
+title: "Kelly Whelan, HW5_R"
+output: html_document
+---
+ 
+'''{r}
+#Problem 1
+#Figure out how to generically extract all numeric columns from any data frame so the method you develop can be used on any data. 
+
+#calls the data frame 'diamonds' into memory 
+data(diamonds)
+
+#'str' does not return anything, it allows you to view the structure of the data frame of 'diamonds' in this case
+str(diamonds)
+
+#'<-' assigns a value to a name, here a new vector is assigned to 'numCol' that uses the built in 'sapply' which by default returns a vector, 
+#which takes all the parts of the data frame diamonds in this case and pulls out the ones that are numeric
+numCol <- diamonds[sapply(diamonds, is.numeric)]
+
+#str() of the newly defined numCol vector shows the parts of diamonds dataframe that actually are numeric
+str(numCol)
+
+
+#Problem 2
+#Create a data frame that contains each pair of variable names in the first column in a single string separated by #a, and their corresponding Pearson correlation coefficient in the second column.
+
+#calling the data frame of diamonds to be used
+data(diamonds)
+
+#<- assigns numCol for each of the conditions presented
+#is.numeric is a more general test of an object being interpretable as numbers
+numCol <- diamonds[sapply(diamonds, is.numeric)]        
+
+#'paste' concatenates vectors after converting to character, 'cor' computes the variance of x and the correlation of x and y 
+numCol <- within(numCol, "carat-depth" <- paste(cor(carat,depth,method="pearson")))
+
+numCol <- within(numCol, "depth-table" <- paste(cor(depth,table,method="pearson")))
+
+numCol <- within(numCol, "table-price" <- paste(cor(table,price,method="pearson")))
+
+numCol <- within(numCol, "price-x" <- paste(cor(price,x,method="pearson")))
+
+numCol <- within(numCol, "x-y" <- paste(cor(x,y,method="pearson")))
+
+numCol <- within(numCol, "y-z" <- paste(cor(y,z,method="pearson")))
+
+numCol <- subset(numCol, select = -c(1,2,3,4,5,6,7))
+
+
+str(numCol)
+
+
+#Problem 3
+#Create and label a scatter plot for every pair of numeric variables. Add a title to the plot that contains the calculated Pearson correlation coefficient of variables contained in the plot.
+
+#'require' loads and attaches add-on packages, in this case the packages of 'grid' and 'ggplot2' in order to compute the scatter plots below
+require(grid)
+require(ggplot2)
+
+#'<-' assigns a value to a name, here a new vector is assigned to 'numCol' that uses the built in 'sapply' which by default returns a vector, 
+#which takes all the parts of the data frame diamonds in this case and pulls out the ones that are numeric
+numCol <- diamonds[sapply(diamonds, is.numeric)]
+str(numCol)
+
+#This is a scatter plot of variable 'Carat' to variable 'Depth' for the Pearson Correlation Coefficient of 0.0282243142790482.
+plot(numCol$carat,numCol$depth,main = "Pearson Coeff = 0.0282243142790482", xlab = "Carat", ylab = "Depth")
+
+#This is a scatter plot of variable 'Depth' to variable 'Table' for the Pearson Correlation Coefficient of 0.0282243142790482.
+plot(numCol$depth,numCol$table,main = "Pearson Coeff = -0.295778521526582", xlab = "Depth", ylab = "Table")
+
+#This is a scatter plot of variable 'Table' to variable 'Price' for the Pearson Correlation Coefficient of 0.0282243142790482.
+plot(numCol$table,numCol$price,main = "Pearson Coeff = 0.127133902121742", xlab = "Table", ylab = "Price")
+
+#This is a scatter plot of variable 'Price' to variable 'x' for the Pearson Correlation Coefficient of 0.0282243142790482.
+plot(numCol$price,numCol$x,main = "Pearson Coeff = 0.884435161016127", xlab = "Price", ylab = "x")
+
+#This is a scatter plot of variable 'x' to variable 'y' for the Pearson Correlation Coefficient of 0.0282243142790482.
+plot(numCol$x,numCol$y,main = "Pearson Coeff = 0.974701479670349", xlab = "x", ylab = "y")
+
+#This is a scatter plot of variable 'y' to variable 'z' for the Pearson Correlation Coefficient of 0.0282243142790482.
+plot(numCol$y,numCol$z,main = "Pearson Coeff = 0.952005716156274", xlab = "y", ylab = "z")
+
+'''
