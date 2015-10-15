@@ -1,0 +1,91 @@
+---
+title: "Kelly Whelan, TEST1_R"
+output: html_document
+---
+
+```{r}
+#Problem 1
+#Add a logical column to diamonds based on the ratio of 1’s and 0’s in the mtcars$vs variable. The variable in mtcars is numeric meaning that you will need to create a logical equivalent, extend it to the same length as diamonds and add it to diamonds data frame.
+
+#calls the data frame 'diamonds' and 'mtcars' into memory 
+#'str' does not return anything, it allows you to view the structure of the data frame of 'diamonds', 'mtcars' and 'mtcars$vs' in this case.
+library(ggplot2)
+data(diamonds)
+str(diamonds)
+data(mtcars)
+str(mtcars)
+str(mtcars$vs)
+
+#Here <- assigns mtcars$vsLog to be logically equivalent to True and False in the previously defined mtcars$vs. Therefore, str(mtcars$vs) outputs the list of 0's and 1's and when mtcars$vsLog <- mtcars$vs == 1, it replaces all the 0's in the list with FALSE and all the 1's in the list with TRUE.
+mtcars$vsLog <- mtcars$vs == 1
+str(mtcars$vsLog)
+
+#'table' uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels. So in this case it calculated the number of False's to be 18 and the numer of True's to be 14. 'str' allows us to view this newly created table.
+l <- table(mtcars$vsLog)
+str(l)
+
+#In the mtcars data frame, there are 32 rows and 14 of them are 1's(True) which means that 14/32= .4375 or 43.75%.  In the diamonds data frame, there are 53,940 rows so we want to create a new column to have 23,599 TRUE's and 30,341 FALSE's because 53,940(.4375) = 23,598.75 or 23,599 1's leaving there to be 53940-23599 = 30341 0's. 
+
+#Here 'A' is being assigned to the above reasoning. 'as.logical' attempts to coerce its argument to be of logical type. 'rep' replicates the values in x. 'c' forms a vector.
+A <- as.logical(rep(c("True","False")), c(23599, 30341)) 
+#str(A) will show us that logi is made up of Trues and Falses
+str(A)
+diamonds <- within(diamonds,'A'<- as.logical(rep(c("True","False"),c(23599,30341))))
+#Here we are creating the new column A which will be shown when we view str(diamonds) and will be placed at the bottom.
+str(diamonds)
+
+
+#Problem 2
+#Figure out how to generically extract all factor and logical columns from any data frame so the method you develop can be used on any data.
+
+#calls the data frame 'diamonds' into memory and allows us to view the data frame by str
+data(diamonds)
+str(diamonds)
+
+#'<-' assigns a value to a name, here a new vector is assigned to 'Factor_Logcial_Columns1' and 'Factor_Logcial_Columns2' that uses the built in 'sapply' which by default returns a vector, which takes all the parts of the data frame diamonds in this case and pulls out the factor and logical columns
+
+Factor_Logcial_Columns1 <- diamonds[sapply(diamonds, is.logical)]  
+Factor_Logcial_Columns2 <- diamonds[sapply(diamonds, is.factor)]  
+#str(Factor_Logical_Columns1)
+str(Factor_Logcial_Columns2)
+
+#is.logical creates a logical vector of the specified length. Each element of the vector is equal to FALSE.
+#is.factor returns TRUE or FALSE depending on whether its argument is of type factor or not. 
+
+#Problem 3
+#Plot a gray bar graph for every factor and logical variable
+
+#'require' loads and attaches add-on packages, in this case the packages of 'grid' and 'ggplot2' in order to compute the bar graphs below
+require(grid)
+require(ggplot2)
+
+#This is a gray bar graph of 'cut' in the diamond data frame which uses the built in function of 'ggplot' and 'geom_bar' to get the appropriate output. 
+#'aes' creates a list of unevaluated expressions. This function also performs partial name matching, converts color to colour, and old style R names to ggplot names 
+graph1 <- ggplot(diamonds, aes(x=diamonds$cut))
+str(graph1)
+graph1 + geom_bar(fill="gray") + labs(x=names(diamonds)[[2]])
+#This is a gray bar graph of 'color' in the diamond data frame.
+graph2 <- ggplot(diamonds, aes(x=diamonds$color))
+str(graph2)
+graph2 + geom_bar(fill="gray") + labs(x=names(diamonds)[[3]])
+#This is a gray bar graph of 'clarity' in the diamond data frame.
+graph3 <- ggplot(diamonds, aes(x=diamonds$clarity))
+str(graph3)
+graph3 + geom_bar(fill="gray") + labs(x=names(diamonds)[[4]]) 
+
+
+#Problem 4
+#Create a list of frequency tables that contains one table for each categorical and logical variable in the data frame.
+
+##'table' uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels. So in this case it calculated the number of False's to be 18 and the numer of True's to be 14. 'str' allows us to view this newly created table.
+#'list' is used in this problem to list all the tables together.
+#I am unsure on how to create the frequency table for each categorical and logical variable.
+listOf_Freq <- table(list(c(diamonds$cut, diamonds$color, diamonds$clarity)))
+str(listOf_Freq)
+
+#FreqList <- table(list(c(diamonds$cut, diamonds$color, diamonds$clarity)),c(Factor_Logcial_Columns1),c(Factor_Logcial_Columns2))
+#str(FreqList)
+```
+
+
+
