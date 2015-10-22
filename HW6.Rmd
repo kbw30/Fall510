@@ -1,0 +1,97 @@
+---
+title: "Kelly Whelan, HW6_R"
+output: html_document
+---
+
+```{r}
+#Problem 1
+#Plot a pair of blue histograms with a vertical red line at the mean for every numerical variable at each bin size specified in the bin sizes input parameter.
+
+#calls the data frame 'diamonds' and 'mtcars' into memory 
+data(diamonds)
+data(mtcars)
+require(ggplot2)
+require(grid)
+#binsizes <- c(5, 20, 50)
+#threshold <- 0.25
+#df <- data(diamonds)
+#Here 'A' is being assigned and 'as.logical' attempts to coerce its argument to be of logical type. 'rep' replicates the values in x. 'c' forms a vector.
+diamonds <- within(diamonds, 'A' <- as.logical(rep(c("True","False"), c(23599, 30341)))) 
+#str(A) will show us that logi is made up of Trues and Falses
+str(diamonds)
+#'<-' assigns a value to a name, here a new vector is assigned to 'var_num', 'var_factor' and 'var_logical' that uses the built in 'sapply' which by default returns a vector, which takes all the parts of the data frame diamonds in this case and pulls out the numeric, factor and logical columns
+var_num <- diamonds[sapply(diamonds, is.numeric) == TRUE]
+var_factor <- diamonds[sapply(diamonds, is.factor) == TRUE]  
+var_logical <- diamonds[sapply(diamonds, is.logical) == TRUE]
+str(var_num)
+str(var_factor)
+str(var_logical)
+
+#Add loop in function for all variables, bin sizes and mean line
+explore <- function(df, binsizes, corr_thresh) 
+{
+  for (i in 1:length(var_num))
+  {
+    for (bins in 1:length(binsizes))
+    {
+      #Calculate bin size
+      num_bins <- (max(var_num[[i]])-min(var_num[[i]]))/binsizes[bins]
+      
+      #Calculate the mean and label
+      col_mean <- mean(var_num[[i]])
+      mean_Label = sprintf("%8.2f ", col_mean)
+      
+      #Plot regular count histogram
+      explore <- ggplot(var_num, aes(x=var_num[[i]]),
+                         environment = environment())
+      explore <- explore +
+        geom_histogram(colour = 'blue',
+                       fill = 'blue',
+                       binwidth=num_bins) +
+        labs(x=names(var_num)[[i]]) +
+        geom_vline(xintercept=col_mean, colour='red') +
+        annotate("text",x=col_mean,y=0,label=mean_Label,hjust=0)
+      print(explore)
+      #Plot denisty histogram
+      print(explore + aes(y=..density..) + labs(y="Density"))
+      }
+    }
+#Problem #2
+#Plot a gray bar graph for every categorical and binary variable.  
+  for ( k in 1:length(var_logical))
+    {
+      explore <- ggplot(var_logical, aes(x=var_logical[[k]]), 
+                        environment = environment()) 
+  
+explore <- explore + geom_bar(fill="gray", colour="gray") + labs(x=names(var_logical)[k])
+print(explore) 
+      }
+#Problem 3
+#Calculate the r^2 value for every pair of numerical variables.
+      for(i in 1:length(var_num))
+      {
+      r_square <- cor(var_num[i] ,var_num[i+1])^2
+      print(r_square)
+      }
+  }
+
+#Test it
+explore (diamonds, c(5,20,50))
+
+
+
+#Problem 4
+#a: A frequency table for every categorical and binary variable.
+freq_a <-table(var_factor[1])
+freq_b <- table(var_factor)
+str(freq_a)
+str(freq_b)
+
+freq_c <-table(var_logical[1])
+freq_d <- table(var_logical)
+str(freq_a)
+str(freq_b)
+
+```
+
+
