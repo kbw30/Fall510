@@ -1,0 +1,412 @@
+---
+title: "Kelly Whelan, TEST2_R"
+output: html_document
+---
+
+```{r}
+Following is an example of how to get a dataset from the web, load it into R and begin exploring the data.
+```{r}
+# UCI is a great resource for datasets. Here's an example of how to 
+# retrieve the Abalone data
+uciaddress <- "http://archive.ics.uci.edu/ml/machine-learning-databases/"
+dataset <- "abalone/abalone.data"
+getdataset <- paste(uciaddress, dataset, sep="")
+abalone <- read.csv(getdataset)
+str(abalone)
+library(gridExtra) #this package is for a later grid plot
+```
+
+Now let's name the columns:
+```{r}
+colnames(abalone) <- c("Gender","Length","Diameter",
+                       "Height", "Whole_wgt",
+                       "Shucked_wgt", "Viscera wgt",
+                       "Shell wgt", "Rings")
+str(abalone)
+```
+
+Here's a method for get a random sample from a dataframe
+
+```{r}
+#Problem 1
+
+#sample sizes: 1%, 10%, 25%, 50%, 80% with 42, 418, 1044, 2088, 3341, 4176 respectively
+
+# Quick way to get a sample from a dataframe
+randomSample = function(dataframe,n,replacement) {
+  return (dataframe[sample(nrow(dataframe), n, replace=replacement),]) }
+
+#generating sample sizes from the abalone dataframe
+sample_1 <- randomSample(abalone, 42, replacement=FALSE)
+sample_10 <- randomSample(abalone, 418, replacement=FALSE)
+sample_25 <- randomSample(abalone, 1044, replacement=FALSE)
+sample_50 <- randomSample(abalone, 2088, replacement=FALSE)
+sample_80 <- randomSample(abalone, 3341, replacement=FALSE)
+sample_100 <- randomSample(abalone, 4176, replacement=FALSE)
+
+#Calculate the min of the Whole_wgt column from each sample and store in a dataframe
+#minimum values for each sample size
+
+a <- min(sample_1$Whole_wgt)
+b <- min(sample_10$Whole_wgt)
+c <- min(sample_25$Whole_wgt)
+d <- min(sample_50$Whole_wgt)
+e <- min(sample_80$Whole_wgt)
+f <- min(sample_100$Whole_wgt)
+
+#vector created to store each min value
+SampleMin <- c(a, b, c, d, e, f)
+
+#Calculate the max of the Whole_wgt column from each sample and store in a dataframe
+#maximum value for each sample size
+a1 <- max(sample_1$Whole_wgt)
+b1 <- max(sample_10$Whole_wgt)
+c1 <- max(sample_25$Whole_wgt)
+d1 <- max(sample_50$Whole_wgt)
+e1 <- max(sample_80$Whole_wgt)
+f1 <- max(sample_100$Whole_wgt)
+
+#vector created to store each max value
+SampleMax <- c(a1, b1, c1, d1, e1, f1)
+
+#mean values for each sample size
+m1 <- mean(sample_1$Whole_wgt)
+m2 <- mean(sample_10$Whole_wgt)
+m3 <- mean(sample_25$Whole_wgt)
+m4 <- mean(sample_50$Whole_wgt)
+m5 <- mean(sample_80$Whole_wgt)
+m6 <- mean(sample_100$Whole_wgt)
+
+#vector created to store each mean value
+SampleMean <- c(m1, m2, m3, m4, m5, m6)
+
+#variance values for each sample size
+v1 <- var(sample_1$Whole_wgt)
+v2 <- var(sample_10$Whole_wgt)
+v3 <- var(sample_25$Whole_wgt)
+v4 <- var(sample_50$Whole_wgt)
+v5 <- var(sample_80$Whole_wgt)
+v6 <- var(sample_100$Whole_wgt)
+
+#vector created to store each variance value
+SampleVar <- c(v1, v2, v3, v4, v5, v6)
+
+#putting all the calculated vecotrs into one dataframe
+df <- data.frame(SampleMin, SampleMax, SampleMean, SampleVar)
+
+#transpose function and we get
+df <- data.frame(t(df))
+
+str(df)
+
+#renaming the column names to reflect the sample size
+colnames(df) <- c("1% Sample", "10% Sample", "25% Sample", "50% Sample", "80% Sample", "100% Sample")
+
+str(df)
+
+```
+
+```{r}
+#Problem 2
+#Create a grid of histograms that contains all sample sizes
+
+require(ggplot2)
+require(grid)
+require(gridExtra)
+samplelist<-c(42,418,1044,2089,3342,4117)
+
+abaloneweight <- data.frame(abalone$whole.weight)
+
+histplot <- function(data,listnum)
+{
+  par(mfrow=c(2,3))
+  for (k in 1:ncol(data))
+  {
+  for (i in listnum)
+  {  
+    hist(data[sample(1:nrow(data),i),k], main=paste("Histogram size of", i ), xlab= i)
+  }
+  }
+}
+histplot(abaloneweight,samplelist)
+
+```
+
+```{r}
+#Problem 3
+#Implement a loop that takes 1,000 samples at each of the sample sizes in 1 above (except the 100% sample!). Calculate a mean at each iteration and store the results in a dataframe. There should be five columns and 1,000 rows. Name the columns but NOT the rows
+
+#Samps <- rep((randomSample(abalone, 42, FALSE)), 1000)
+#Samps <- data.frame(Samps)
+#print(Samps$Whole_wgt[1])
+#for(i in 1:length(Samps)){
+#  my list <- list()
+#  while (i <= 1000){
+#    Mean <- mean(Samps$Whole_wgt[i])
+#    myList <- Mean
+#  }
+#}
+#print(Mean)
+############################################################
+
+sample_1f=c(rep(0,times=1000))
+sample_10f=c(rep(0,times=1000))
+sample_25f=c(rep(0,times=1000))
+sample_50f=c(rep(0,times=1000))
+sample_80f=c(rep(0,times=1000))
+
+for (i in 1:1000){
+randomSample = function(dataframe,n,replacement) {
+  return (dataframe[sample(nrow(dataframe), n, replace=replacement),]) }
+  sample_1 <- randomSample(abalone, 42, FALSE)
+  sample_10 <- randomSample(abalone, 418, FALSE)
+  sample_25 <- randomSample(abalone, 1044, FALSE)
+  sample_50 <- randomSample(abalone, 2088, FALSE)
+  sample_80 <- randomSample(abalone, 3341, FALSE)
+
+
+sample_1mean1 = mean(sample_1[,5])
+sample_1f[i] = sample_1mean1 
+sample_10mean1 = mean(sample_10[,5])
+sample_10f[i] = sample_10mean1 
+sample_25mean1 = mean(sample_25[,5])
+sample_25f[i] = sample_25mean1 
+sample_50mean1 = mean(sample_50[,5])
+sample_50f[i] = sample_50mean1 
+sample_80mean1 = mean(sample_80[,5])
+sample_80f[i] = sample_80mean1 
+
+}
+
+dff=data.frame(cbind(sample_1f,sample_10f,sample_25f,sample_50f,sample_80f))
+str(dff)
+colnames(dff) <- c("1% Sample", "10% Sample", "25% Sample", "50% Sample", "80% Sample")
+
+```
+
+```{r}
+#Problem 4
+#Create another grid of histograms that contains the five columns just created and include the 100% sample from 1. 
+require(ggplot2)
+require(grid)
+
+hist1<- ggplot(dff[1], aes(x=dff[[1]]))
+hist1 <- hist1 + geom_histogram(colour='blue', fill='black') + labs(x=names(dff)[[1]])
+print(hist1)
+
+hist2<- ggplot(dff[2], aes(x=dff[[2]]))
+hist2 <- hist2 + geom_histogram(colour="grey", fill="black") + labs(x=names(dff)[[2]])
+print(hist2)
+
+hist3<- ggplot(dff[3], aes(x=dff[[3]]))
+hist3 <- hist3 + geom_histogram(colour="magenta", fill="black") + labs(x=names(dff)[[3]])
+print(hist3)
+
+hist4<- ggplot(dff[4], aes(x=dff[[4]]))
+hist4 <- hist4 + geom_histogram(colour="pink", fill="black") + labs(x=names(dff)[[4]])
+print(hist4)
+
+hist5<- ggplot(dff[5], aes(x=dff[[5]]))
+hist5 <- hist5 + geom_histogram(colour="red", fill="black") + labs(x=names(dff)[[5]])
+print(hist5)
+
+hist6<- ggplot(df[6], aes(x=df[[6]]))
+hist6 <- hist6 + geom_histogram(colour="yellow", fill="black") + labs(x=names(df)[[6]])
+print(hist6)
+
+
+grid.arrange(hist1, hist2, hist3, hist4, hist5, hist6, ncol=3)
+
+
+```
+
+```{r}
+#Problem 5
+#Calculate the min, max, mean and variance of each column from 3 and of the total dataset (the 100% sample). Append to the dataframe created in 1. Name the mean row ResampleMean and the others appropriately.
+#Calculate the min of the Whole_wgt column from each sample and store in a dataframe
+#minimum values for each sample size
+
+diffa <- min(dff[,1])
+diffb <- min(dff[,2])
+diffc <- min(dff[,3])
+diffd <- min(dff[,4])
+diffe <- min(dff[,5])
+difff <- min(sample_100[,5])
+
+#vector created to store each min value
+DiffSampleMin <- c(diffa, diffb, diffc, diffd, diffe, difff)
+
+#Calculate the max of the Whole_wgt column from each sample and store in a dataframe
+#maximum value for each sample size
+diffa1 <- max(dff[,1])
+diffb1 <- max(dff[,2])
+diffc1 <- max(dff[,3])
+diffd1 <- max(dff[,4])
+diffe1 <- max(dff[,5])
+difff1 <- max(sample_100[,5])
+
+#vector created to store each max value
+DiffSampleMax <- c(diffa1, diffb1, diffc1, diffd1, diffe1, difff1)
+
+#mean values for each sample size
+diffm1 <- mean(dff[,1])
+diffm2 <- mean(dff[,2])
+diffm3 <- mean(dff[,3])
+diffm4 <- mean(dff[,4])
+diffm5 <- mean(dff[,5])
+diffm6 <- mean(sample_100[,5])
+
+#vector created to store each mean value
+DiffSampleMean <- c(diffm1, diffm2, diffm3, diffm4, diffm5, diffm6)
+
+#variance values for each sample size
+diffv1 <- var(dff[,1])
+diffv2 <- var(dff[,2])
+diffv3 <- var(dff[,3])
+diffv4 <- var(dff[,4])
+diffv5 <- var(dff[,5])
+diffv6 <- var(sample_100[,5])
+
+#vector created to store each variance value
+DiffSampleVar <- c(diffv1, diffv2, diffv3, diffv4, diffv5, diffv6)
+
+#putting all the calculated vecotrs into one dataframe
+dffff <- data.frame(DiffSampleMin, DiffSampleMax, DiffSampleMean, DiffSampleVar)
+
+#transpose function and we get
+dffff <- data.frame(t(df))
+
+str(df)
+
+#renaming the column names to reflect the sample size
+colnames(dffff) <- c("1% Sample", "10% Sample", "25% Sample", "50% Sample", "80% Sample")
+hi <- rbind(df, dffff)
+
+hi <- data.frame(hi)
+colnames(hi) <- c("1% Sample", "10% Sample", "25% Sample", "50% Sample", "80% Sample", "100% Sample")
+
+str(dffff)
+
+
+```
+
+
+```{r}
+#Problem 6
+#Create a single histogram of the 100% data and overlay and label lines that represent the 1%, 10%, 25%, 50%, and 80% SampleMean.
+
+#mean values for each sample size
+m1 <- mean(sample_1$Whole_wgt)
+m2 <- mean(sample_10$Whole_wgt)
+m3 <- mean(sample_25$Whole_wgt)
+m4 <- mean(sample_50$Whole_wgt)
+m5 <- mean(sample_80$Whole_wgt)
+#m6 <- mean(sample_100$Whole_wgt)
+
+Handle_Num2 <- function(Num_Frame) 
+{
+  for (i in 1:length(Num_Frame)){
+    col_mean1 <- SampleMean [[1]]
+    col_mean2 <- SampleMean [[2]]
+    col_mean3 <- SampleMean [[3]]
+    col_mean4 <- SampleMean [[4]]
+    col_mean5 <- SampleMean [[5]]
+    mean_Label1 = sprintf("10f", col_mean1)
+    mean_Label2 = sprintf("10f", col_mean2)
+    mean_Label3 = sprintf("10f", col_mean3)
+    mean_Label4 = sprintf("10f", col_mean4)
+    mean_Label5 = sprintf("10f", col_mean5)
+
+  
+    Num_Plot <- ggplot(Num_Frame, aes(x=Num_Frame[[i]]),
+                     environment = environment())
+    Num_Plot <- Num_Plot + geom_histogram(colour ='gray', fill ='gray') + labs(x=names(Num_Frame)[[i]]) + geom_vline(xintercept=col_mean1, colour ='black', size=1) + geom_vline(xintercept=col_mean2, colour = 'black',size=1) + geom_vline(xintercept=col_mean3, colour = 'pink',size=1) + geom_vline(xintercept=col_mean4, colour = 'pink',size=1) + geom_vline(xintercept=col_mean5, colour = 'blue',size=1) + annotate("text", x=col_mean1,y=0, label ="1%=red") + annotate("text", x=col_mean2,y=0, label ="10%=black") + annotate("text", x=col_mean3,y=0, label ="25%=pink") + annotate("text", x=col_mean4,y=0, label ="50%=pink") + annotate("text", x=col_mean5,y=0, label ="80%=blue")
+
+  print(Num_Plot)
+  }
+}
+
+Handle_Num2(abalone[5])
+
+```
+
+```{r}
+#7
+#Create a second histogram of the 100% data and overlay and label vertical lines that represent the 1%, 10%, 25%, 50%, and 80% ResampleMean.
+
+DiffSampleMean <- c(diffm1, diffm2, diffm3, diffm4, diffm5, diffm6)
+
+Handle_Num2 <- function(Num_Frame) 
+{
+  for (i in 1:length(Num_Frame)){
+    col_mean1 <- DiffSampleMean [[1]]
+    col_mean2 <- DiffSampleMean [[2]]
+    col_mean3 <- DiffSampleMean [[3]]
+    col_mean4 <- DiffSampleMean [[4]]
+    col_mean5 <- DiffSampleMean [[5]]
+    mean_Label1 = sprintf("10f", col_mean1)
+    mean_Label2 = sprintf("10f", col_mean2)
+    mean_Label3 = sprintf("10f", col_mean3)
+    mean_Label4 = sprintf("10f", col_mean4)
+    mean_Label5 = sprintf("10f", col_mean5)
+
+  
+    Num_Plot <- ggplot(Num_Frame, aes(x=Num_Frame[[i]]),
+                     environment = environment())
+    Num_Plot <- Num_Plot + geom_histogram(colour ='gray', fill ='gray') + labs(x=names(Num_Frame)[[i]]) + geom_vline(xintercept=col_mean1, colour ='black', size=1) + geom_vline(xintercept=col_mean2, colour = 'black',size=1) + geom_vline(xintercept=col_mean3, colour = 'pink',size=1) + geom_vline(xintercept=col_mean4, colour = 'pink',size=1) + geom_vline(xintercept=col_mean5, colour = 'blue',size=1) + annotate("text", x=col_mean1,y=0, label ="1%=red") + annotate("text", x=col_mean2,y=0, label ="10%=black") + annotate("text", x=col_mean3,y=0, label ="25%=pink") + annotate("text", x=col_mean4,y=0, label ="50%=pink") + annotate("text", x=col_mean5,y=0, label ="80%=blue")
+
+  print(Num_Plot)
+  }
+}
+
+Handle_Num2(abalone[5])
+
+
+```
+
+```{r}
+#8
+#Now execute your code on diamonds$carat and faithful$eruptions.
+data(faithful)
+
+sample_1f=c(rep(0,times=1000))
+sample_10f=c(rep(0,times=1000))
+sample_25f=c(rep(0,times=1000))
+sample_50f=c(rep(0,times=1000))
+sample_80f=c(rep(0,times=1000))
+
+for (i in 1:1000){
+randomSample = function(dataframe,n,replacement) {
+  return (dataframe[sample(nrow(dataframe), n, replace=replacement),]) }
+  sample_1 <- randomSample(faithful, 3, FALSE)
+  sample_10 <- randomSample(faithful, 27, FALSE)
+  sample_25 <- randomSample(faithful, 68, FALSE)
+  sample_50 <- randomSample(faithful, 136, FALSE)
+  sample_80 <- randomSample(faithful, 218, FALSE)
+
+
+sample_1mean1 = mean(sample_1[,1])
+sample_1f[i] = sample_1mean1 
+sample_10mean1 = mean(sample_10[,1])
+sample_10f[i] = sample_10mean1 
+sample_25mean1 = mean(sample_25[,1])
+sample_25f[i] = sample_25mean1 
+sample_50mean1 = mean(sample_50[,1])
+sample_50f[i] = sample_50mean1 
+sample_80mean1 = mean(sample_80[,1])
+sample_80f[i] = sample_80mean1 
+
+}
+
+dff=data.frame(cbind(sample_1f,sample_10f,sample_25f,sample_50f,sample_80f))
+str(dff)
+colnames(dff) <- c("1% Sample", "10% Sample", "25% Sample", "50% Sample", "80% Sample")
+```
+
+```{r}
+#9
+#Provide a brief explanation of what you observe in the measures and histograms as it relates to sample size and resampling.
+
+# From this assignment I observed that resampling allows data to get closer and closer to the mean. 
+
+```
