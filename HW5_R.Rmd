@@ -2,12 +2,17 @@
 title: "Kelly Whelan, HW5_R"
 output: html_document
 ---
- 
+
+SW: need to use ``` vs '''
+
 '''{r}
+```{r}
 #Problem 1
 #Figure out how to generically extract all numeric columns from any data frame so the method you develop can be used on any data. 
 
 #calls the data frame 'diamonds' into memory 
+# SW: need to load ggplot2 library to make data set available
+library(ggplot2)
 data(diamonds)
 
 #'str' does not return anything, it allows you to view the structure of the data frame of 'diamonds' in this case
@@ -48,8 +53,31 @@ numCol <- subset(numCol, select = -c(1,2,3,4,5,6,7))
 
 
 str(numCol)
+```
 
+```{r}
+# SW: lost points: this is not correct, you should be calculating the 
+# correlation for all unique pairs of numeric variables (21 total pairs) 
+# and returning a data frame with a single row per pair. see below.
+get_numeric <- function(dat) {
+  nc <- lapply(dat, class) %in% c("numeric","integer")
+  return(dat[,nc])
+}
 
+corrfn <- function(dat) {
+  comb <- combn(colnames(dat), 2)
+  out <- apply(comb, MARGIN = 2, 
+               FUN = function(x) {
+                 return(c(paste(x[1], x[2], sep="-"), 
+                          cor(dat[x[1]], dat[x[2]])))
+               })
+  return(data.frame(vars = out[1,], corr = out[2,]))
+}
+
+corrfn(get_numeric(diamonds))
+```
+
+```{r}
 #Problem 3
 #Create and label a scatter plot for every pair of numeric variables. Add a title to the plot that contains the calculated Pearson correlation coefficient of variables contained in the plot.
 
@@ -80,4 +108,26 @@ plot(numCol$x,numCol$y,main = "Pearson Coeff = 0.974701479670349", xlab = "x", y
 #This is a scatter plot of variable 'y' to variable 'z' for the Pearson Correlation Coefficient of 0.0282243142790482.
 plot(numCol$y,numCol$z,main = "Pearson Coeff = 0.952005716156274", xlab = "y", ylab = "z")
 
+```
+
+```{r, eval = F}
+# SW: lost points: the plots you show are correct, but you were supposed 
+# to create a scatterplot for each of the pairs of numeric variables. 
+# also, specifying the plots one by one is tedious and error-prone, see
+# code below.
+plotnum <- function(dat) {
+  dat_nc <- get_numeric(dat)
+  lbl <- corrfn(dat_nc)
+  comb <- combn(colnames(dat_nc), 2)
+  apply(comb, MARGIN = 2,
+        FUN = function(x) {
+          plot(dat_nc[,x[1]], dat_nc[,x[2]], xlab = x[1], ylab = x[2],
+               main = paste0(x[1],"-",x[2],": ",
+                             lbl[lbl[,1] == paste(x[1],x[2],sep="-"),2]))
+        })
+}
+
+plotnum(diamonds)
+```
+SW: same issue with ''' vs ```
 '''
