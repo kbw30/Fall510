@@ -32,6 +32,9 @@ yVec <- sample(0:999,250, replace=T)
 
 yVec[-1] - xVec[-length(xVec)]
 sin(yVec[-length(yVec)] / cos(xVec[-1]))
+# SW: lost points: look at your parentheses, this is the wrong function, should be
+sin(yVec[-length(yVec)]) / cos(xVec[-1])
+
 xVec[-c(249,250)] + 2*xVec[-c(1,250)]-xVec[-c(1,2)]
 sum(exp(-xVec[-1])/(xVec[-length(xVec)]+10))
 
@@ -43,7 +46,8 @@ sum( yVec>max(yVec)-200 )
 sum(xVec%%2==0)
 xVec[order(yVec)]
 yVec[c(T,F,F)]
-
+# SW: the output of this is theoretically fine, but your HTML file 
+# shows it as NA
 
 1+sum(cumprod(seq(2,38,b=2)/seq(3,39,b=2)))
 
