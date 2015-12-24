@@ -3,19 +3,26 @@ title: "Kelly Whelan, HW6_R"
 output: html_document
 ---
 
+SW: did you test your code? it doesn't work as written. i've modified it a bit to help isolate the problem, but it will require more extensive fixes. from what I can tell just based on reading the code (vs being able to run it), it looks like you aren't returning a single data frame and your `explore` function does not accept a correlation threshold. also, within your `explore` function, you assign new values to the function object itself, it's not at all clear how this design will work.
+
 ```{r}
 #Problem 1
 #Plot a pair of blue histograms with a vertical red line at the mean for every numerical variable at each bin size specified in the bin sizes input parameter.
 
 #calls the data frame 'diamonds' and 'mtcars' into memory 
-data(diamonds)
-data(mtcars)
+# SW: you cannot load the diamonds data set if you have not first loaded
+# ggplot2, this causes all subsequent references to diamonds to fail.
 require(ggplot2)
 require(grid)
+
+data(diamonds)
+data(mtcars)
+
 #binsizes <- c(5, 20, 50)
 #threshold <- 0.25
 #df <- data(diamonds)
 #Here 'A' is being assigned and 'as.logical' attempts to coerce its argument to be of logical type. 'rep' replicates the values in x. 'c' forms a vector.
+
 diamonds <- within(diamonds, 'A' <- as.logical(rep(c("True","False"), c(23599, 30341)))) 
 #str(A) will show us that logi is made up of Trues and Falses
 str(diamonds)
@@ -26,7 +33,9 @@ var_logical <- diamonds[sapply(diamonds, is.logical) == TRUE]
 str(var_num)
 str(var_factor)
 str(var_logical)
+```
 
+```{r}
 #Add loop in function for all variables, bin sizes and mean line
 explore <- function(df, binsizes, corr_thresh) 
 {
@@ -74,10 +83,14 @@ print(explore)
       print(r_square)
       }
   }
+```
 
+```{r}
 #Test it
-explore (diamonds, c(5,20,50))
+explore(diamonds, c(5,20,50))
+```
 
+```{r}
 
 
 #Problem 4
